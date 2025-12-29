@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Your Cart</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <style>
+      #userGreeting {
+        display: none;
+      }
+      #logout-btn {
+        display: none;
+      }
+      #login-btn {
+        display: inline;
+      }
+      #register-btn {
+        display: inline;
+      }
+
+      .cart-container {
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      .cart-container h1 {
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .cart-item {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding: 20px 0;
+      }
+
+      .cart-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        border-radius: 8px;
+      }
+
+      .cart-details {
+        flex: 1;
+      }
+
+      .cart-details p {
+        margin: 6px 0;
+      }
+
+      .cart-remove-btn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .totalAmount {
+        text-align: right;
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+
+      .checkout-card {
+        margin-top: 30px;
+        text-align: right;
+      }
+
+      .empty-cart {
+        text-align: center;
+        padding: 60px 0;
+      }
+
+      @media (max-width: 768px) {
+        .cart-item {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <nav>
+      <div class="logo">FASHION</div>
+
+      <div class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="shop.html">Shop</a>
+        <a href="contact.html">Contact</a>
+      </div>
+
+      <div class="auth-icon">
+        <div class="user-menu-container" id="userMenu">
+          <button id="userMenuButton" class="user-avatar">
+            <img src="https://i.pravatar.cc/40" alt="User Avatar" />
+          </button>
+          <div id="userDropdown" class="user-dropdown hidden">
+            <button class="btn authBtn" id="userGreeting"></button>
+            <a class="btn" href="myorders.html">Orders</a>
+            <button class="btn" id="logout-btn" onclick="logout()">Logout</button>
+          </div>
+        </div>
+
+        <div>
+          <button class="btn authBtn" id="login-btn">
+            <a href="login.html">Login</a>
+          </button>
+          <button class="btn authBtn" id="register-btn">
+            <a href="register.html">Register</a>
+          </button>
+        </div>
+
+        <a href="cart.html" class="cart-icon">
+          <img
+            src="https://img.icons8.com/ios-filled/24/shopping-bag.png"
+            alt="Cart"
+          />
+          <span class="cart-count" id="cartCount">0</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- CART CONTENT -->
+    <div class="container cart-container">
+      <h1>Your Shopping Cart</h1>
+      <div id="cartContainer"></div>
+      <div id="totalAmount" class="totalAmount"></div>
+
+      <div class="checkout-card">
+        <a href="checkout.html" class="btn">Proceed to Checkout</a>
+      </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="navbar.js"></script>
+
+    <script>
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const cartContainer = document.getElementById("cartContainer");
+      const totalAmountEl = document.getElementById("totalAmount");
+
+      if (cart.length === 0) {
+        cartContainer.innerHTML = `
+          <div class="empty-cart">
+            <h2>Your cart is empty</h2>
+            <a href="shop.html" class="btn">Go to Shop</a>
+          </div>
+        `;
+        totalAmountEl.textContent = "";
+      } else {
+        let total = 0;
+
+        cart.forEach((item) => {
+          total += item.price * item.quantity;
+
+          const div = document.createElement("div");
+          div.className = "cart-item";
+
+          div.innerHTML = `
+            <img src="${item.images[0]}" alt="${item.name}" />
+            <div class="cart-details">
+              <p><strong>${item.name}</strong></p>
+              <p>Price: $${item.price}</p>
+              <p>Quantity: ${item.quantity}</p>
+              <p><strong>Total: $${(
+                item.price * item.quantity
+              ).toFixed(2)}</strong></p>
+              <button class="cart-remove-btn" onclick="removeFromCart(${
+                item.id
+              })">Remove</button>
+            </div>
+          `;
+
+          cartContainer.appendChild(div);
+        });
+
+        totalAmountEl.textContent = `Grand Total: $${total.toFixed(2)}`;
+      }
+
+      function removeFromCart(id) {
+        if (confirm("Remove this item from cart?")) {
+          const updatedCart = cart.filter((item) => item.id !== id);
+          localStorage.setItem("cart", JSON.stringify(updatedCart));
+          window.location.reload();
+        }
+      }
+
+      function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById("cartCount").textContent = totalItems;
+      }
+
+      updateCartCount();
+    </script>
+  </body>
+</html>
